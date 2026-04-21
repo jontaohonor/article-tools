@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atelier · 文章工坊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body data-theme="magazine">
+
+<!-- 顶部导航栏 -->
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-text">
+        <div class="brand-name">Atelier</div>
+        <div class="brand-sub">文章工坊 · Vol. 01</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-tool="editor">
+        <span class="nav-num">01</span>
+        <span class="nav-label">排版</span>
+      </button>
+      <button class="nav-item" data-tool="cover">
+        <span class="nav-num">02</span>
+        <span class="nav-label">封面</span>
+      </button>
+      <button class="nav-item" data-tool="qrcode">
+        <span class="nav-num">03</span>
+        <span class="nav-label">二维码</span>
+      </button>
+      <button class="nav-item" data-tool="drafts">
+        <span class="nav-num">04</span>
+        <span class="nav-label">草稿</span>
+      </button>
+    </nav>
+
+    <div class="masthead-actions">
+      <div class="theme-switcher">
+        <button class="theme-dot" data-theme="magazine" title="杂志" style="--dot: #c8553d"></button>
+        <button class="theme-dot" data-theme="minimal" title="极简" style="--dot: #1a1a1a"></button>
+        <button class="theme-dot" data-theme="ink" title="墨色" style="--dot: #2d3e2e"></button>
+        <button class="theme-dot" data-theme="dusk" title="暮光" style="--dot: #6b4f8a"></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 主工作区 -->
+<main class="stage">
+
+  <!-- 工具 1: MD → 微信排版 -->
+  <section class="tool-panel active" data-panel="editor">
+    <div class="editor-layout">
+      <!-- 左：编辑区 -->
+      <div class="editor-pane">
+        <div class="pane-header">
+          <div class="pane-title">
+            <span class="pane-num">§ 01</span>
+            <span>Markdown</span>
+          </div>
+          <div class="pane-stats">
+            <span id="stat-words">0 字</span>
+            <span class="stat-sep">·</span>
+            <span id="stat-reading">0 分钟</span>
+          </div>
+        </div>
+        <textarea id="md-input" class="md-editor" spellcheck="false" placeholder="在这里开始写作…
+
+# 这是标题
+
+这是一段正文。**粗体**，*斜体*，`行内代码`。
+
+> 引用段落，写下你的思考。
+
+- 列表项一
+- 列表项二
+
+```js
+console.log('Hello')
+```"></textarea>
+        <div class="pane-toolbar">
+          <div class="toolbar-group">
+            <label class="btn btn-ghost" for="md-file-input">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              导入 .md
+            </label>
+            <input type="file" id="md-file-input" accept=".md,.markdown,.txt" hidden>
+            <button class="btn btn-ghost" id="btn-save-draft">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              存为草稿
+            </button>
+          </div>
+          <div class="toolbar-group">
+            <select id="style-select" class="select">
+              <option value="classic">经典 · 宋体</option>
+              <option value="modern">现代 · 黑体</option>
+              <option value="serif">文艺 · 衬线</option>
+              <option value="tech">科技 · 等宽</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右：预览区 -->
+      <div class="preview-pane">
+        <div class="pane-header">
+          <div class="pane-title">
+            <span class="pane-num">§ 02</span>
+            <span>微信预览</span>
+          </div>
+          <div class="pane-actions">
+            <button class="btn btn-primary" id="btn-copy-rich">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>复制到公众号</span>
+            </button>
+          </div>
+        </div>
+        <div class="preview-frame">
+          <div class="phone-mock">
+            <div id="md-preview" class="md-preview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 工具 2: 封面生成 -->
+  <section class="tool-panel" data-panel="cover">
+    <div class="cover-layout">
+      <aside class="cover-controls">
+        <div class="control-group">
+          <label class="control-label">主标题</label>
+          <input type="text" id="cover-title" class="input" value="一篇值得阅读的文章">
+        </div>
+        <div class="control-group">
+          <label class="control-label">副标题</label>
+          <input type="text" id="cover-subtitle" class="input" value="A Thoughtful Essay">
+        </div>
+        <div class="control-group">
+          <label class="control-label">署名</label>
+          <input type="text" id="cover-author" class="input" value="你的名字">
+        </div>
+        <div class="control-group">
+          <label class="control-label">模板风格</label>
+          <div class="template-grid">
+            <button class="template-btn active" data-template="editorial">
+              <div class="template-preview tp-editorial"></div>
+              <span>编辑部</span>
+            </button>
+            <button class="template-btn" data-template="gradient">
+              <div class="template-preview tp-gradient"></div>
+              <span>渐变</span>
+            </button>
+            <button class="template-btn" data-template="minimal">
+              <div class="template-preview tp-minimal"></div>
+              <span>极简</span>
+            </button>
+            <button class="template-btn" data-template="stamp">
+              <div class="template-preview tp-stamp"></div>
+              <span>印章</span>
+            </button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">主色</label>
+          <div class="color-row">
+            <button class="color-dot active" data-color="#c8553d" style="background:#c8553d"></button>
+            <button class="color-dot" data-color="#1a1a1a" style="background:#1a1a1a"></button>
+            <button class="color-dot" data-color="#2d3e2e" style="background:#2d3e2e"></button>
+            <button class="color-dot" data-color="#6b4f8a" style="background:#6b4f8a"></button>
+            <button class="color-dot" data-color="#1e3a5f" style="background:#1e3a5f"></button>
+            <button class="color-dot" data-color="#c69c6d" style="background:#c69c6d"></button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" id="btn-export-cover">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          导出 PNG (2.35:1)
+        </button>
+      </aside>
+      <div class="cover-stage">
+        <div id="cover-canvas" class="cover-canvas template-editorial" style="--main:#c8553d">
+          <div class="cover-inner">
+            <div class="cover-meta">
+              <span class="cover-issue">ISSUE · 2026</span>
+              <span class="cover-dot"></span>
+              <span class="cover-date" id="cover-date"></span>
+            </div>
+            <h1 class="cover-main-title" id="cover-preview-title">一篇值得阅读的文章</h1>
+            <p class="cover-sub" id="cover-preview-subtitle">A Thoughtful Essay</p>
+            <div class="cover-footer">
+              <span class="cover-author-name" id="cover-preview-author">你的名字</span>
+              <span class="cover-rule"></span>
+              <span class="cover-tag">ATELIER</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 工具 3: 二维码 -->
+  <section class="tool-panel" data-panel="qrcode">
+    <div class="qr-layout">
+      <aside class="qr-controls">
+        <div class="control-group">
+          <label class="control-label">内容 / 链接</label>
+          <textarea id="qr-content" class="input input-area" rows="4" placeholder="https://...">https://mp.weixin.qq.com/</textarea>
+        </div>
+        <div class="control-group">
+          <label class="control-label">前景色</label>
+          <div class="color-row">
+            <button class="qr-color-dot active" data-color="#1a1a1a" style="background:#1a1a1a"></button>
+            <button class="qr-color-dot" data-color="#c8553d" style="background:#c8553d"></button>
+            <button class="qr-color-dot" data-color="#2d3e2e" style="background:#2d3e2e"></button>
+            <button class="qr-color-dot" data-color="#1e3a5f" style="background:#1e3a5f"></button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">中心 Logo（可选）</label>
+          <label class="btn btn-ghost btn-full" for="qr-logo-input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            上传图片
+          </label>
+          <input type="file" id="qr-logo-input" accept="image/*" hidden>
+        </div>
+        <button class="btn btn-primary btn-full" id="btn-download-qr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          下载二维码
+        </button>
+      </aside>
+      <div class="qr-stage">
+        <div class="qr-frame">
+          <canvas id="qr-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 工具 4: 草稿管理 -->
+  <section class="tool-panel" data-panel="drafts">
+    <div class="drafts-layout">
+      <div class="drafts-header">
+        <h2 class="section-title">草稿 Archive</h2>
+        <p class="section-desc">所有草稿保存在浏览器本地，自动记录版本历史。</p>
+      </div>
+      <div class="drafts-list" id="drafts-list">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 吐司提示 -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
